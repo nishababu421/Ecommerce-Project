@@ -1,0 +1,116 @@
+const port = 4000;
+const express = require("express");
+const app = express();
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const cors = require("cors");
+const fs = require("fs");
+
+app.use(express.json());
+app.use(cors());
+
+mongoose.connect("mongodb+srv://DiApiH9kDBFgzPRs:DiApiH9kDBFgzPRs@cluster0.9kbuvgb.mongodb.net/")
+  .then(() => console.log("Database connection successful"))
+  .catch((err) => console.log(err));
+
+// Define the upload directory
+const imageFolder = path.join(__dirname, 'upload', 'images');
+
+// Ensure the directory exists, if not, create it
+if (!fs.existsSync(imageFolder)) {
+    fs.mkdirSync(imageFolder, { recursive: true });
+}
+
+// Image storage engine
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, imageFolder); // Use the created path
+    },
+    filename: (req, file, cb) => {
+        console.log(file);
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Creating upload endpoint for images
+app.use('/images', express.static(imageFolder));
+
+
+app.post("/upload", upload.single('product'), (req, res) => {
+    console.log(req.file);
+    if (!req.file) {
+        return res.status(400).json({
+            success: 0,
+            message: "No file uploaded",
+        });
+    }
+
+    res.json({
+        success: 1,
+        image_url: `http://localhost:${port}/images/${req.file.filename}`,
+    });
+});
+
+// Schema for creating products
+const Product = mongoose.model("Product", {
+    id: {
+        type: Number,
+        // required: true,
+    },
+    name: {
+        type: String,
+        // required: true,
+    },
+    image: {
+        type: String,
+        //  required: true,
+    },
+    category: {
+        type: String,
+        // required: true,
+    },
+    new_price: {
+        type: Number,
+        // required: true,
+    },
+    date: {
+        type: Date,
+        default: Date.now,
+    },
+    available: {
+        type: Boolean,
+        default: true,
+    },
+});
+app.post('/addproduct',async(req,res)=>{
+    const {id,name,image,category,new_price,old_price} = req.body;
+const product =new Product({
+    id:id,
+    name:name,
+    image:image,
+    category:category,
+    new_price:new_price,
+    old_price:old_price,
+});
+console.log(product);
+await product.save();
+console.log("saved");
+res.json({
+    success:true,
+    name:req.body.name,
+    product:product
+})
+
+})
+
+app.listen(port, (error) => {
+    if (!error) {
+        console.log("Server running on port " + port);
+    } else {
+        console.log("Error: " + error);
+    }
+});
