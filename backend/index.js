@@ -59,23 +59,23 @@ app.post("/upload", upload.single('product'), (req, res) => {
 const Product = mongoose.model("Product", {
     id: {
         type: Number,
-        // required: true,
+         required: true,
     },
     name: {
         type: String,
-        // required: true,
+        required: true,
     },
     image: {
         type: String,
-        //  required: true,
+         required: true,
     },
     category: {
         type: String,
-        // required: true,
+         required: true,
     },
     new_price: {
         type: Number,
-        // required: true,
+         required: true,
     },
     date: {
         type: Date,
@@ -87,14 +87,24 @@ const Product = mongoose.model("Product", {
     },
 });
 app.post('/addproduct',async(req,res)=>{
-    const {id,name,image,category,new_price,old_price} = req.body;
+    let products =await Product.find({});
+    let id;
+    if(products.length>0){
+        let last_product_array=products.slice(-1);
+        let last_product =last_product_array[0];
+        id=last_product.id+1;
+    }
+    else{
+        id=1;
+    }
 const product =new Product({
+
     id:id,
-    name:name,
-    image:image,
-    category:category,
-    new_price:new_price,
-    old_price:old_price,
+    name:req.body.name,
+    image:req.body.image,
+    category:req.body.category,
+    new_price:req.body.new_price,
+    old_price:req.body.old_price,
 });
 console.log(product);
 await product.save();
@@ -102,8 +112,25 @@ console.log("saved");
 res.json({
     success:true,
     name:req.body.name,
-    product:product
+   
 })
+
+})
+//creating API for deleting Product
+app.post('/removeproduct',async(req,res)=>{
+    await Product.findOneAndDelete({id:req.body.id})
+console.log("Removed");
+res.json({
+    success:true,
+    name:req.body.name
+})
+
+})
+//creating API for getting all products
+app.get('/allproducts',async(req,res)=>{
+    let products=await Product.find({});
+    console.log("All products fetched")
+    res.send(products);
 
 })
 
