@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './CartItems.css';
 import { ShopContext } from '../../Context/ShopContext';
 import remove_icon from '../Assets/cart_cross_icon.png';
 
 const CartItems = () => {
-    const { all_product, cartItems, removeFromCart, addToCart } = useContext(ShopContext);
+    const { all_product, cartItems, removeFromCart } = useContext(ShopContext);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const subtotal = all_product.reduce((total, product) => {
         const quantity = cartItems[product.id] || 0;
@@ -14,6 +16,10 @@ const CartItems = () => {
 
     const shippingFee = 0;
     const total = subtotal + shippingFee;
+
+    const handleCheckout = () => {
+        navigate('/checkout'); // Navigate to checkout page
+    };
 
     return (
         <div className='cartitems'>
@@ -69,7 +75,7 @@ const CartItems = () => {
                             <h3>${total.toFixed(2)}</h3>
                         </div>
                     </div>
-                    <button>PROCEED TO CHECKOUT</button>
+                    <button onClick={handleCheckout}>PROCEED TO CHECKOUT</button> {/* Call handleCheckout */}
                 </div>
                 <div className='cartitems-promocode'>
                     <p>If you have a promo code, enter it here:</p>  

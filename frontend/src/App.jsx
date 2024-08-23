@@ -9,6 +9,8 @@ import LoginSignup from './pages/LoginSignup';  // Assuming LoginSignup componen
  import men_banner from './components/Assets/men_banner.png'
  import women_banner from './components/Assets/women_banner.png'
   import kid_banner from './components/Assets/kid_banner.png'
+import Checkout from './components/Checkout/Checkout';
+
  function App() {
   return (
     <div>
@@ -24,6 +26,8 @@ import LoginSignup from './pages/LoginSignup';  // Assuming LoginSignup componen
           </Route>
           <Route path='/cart' element={<Cart/>} />
           <Route path='/login' element={<LoginSignup/>} />
+          <Route path="/checkout" element={<Checkout />} />
+          
         </Routes>
         <Footer/>
       </BrowserRouter>
